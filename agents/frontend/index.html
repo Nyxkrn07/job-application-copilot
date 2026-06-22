@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Job Application Co-Pilot</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #c8f1ee;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+        }
+
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            border-left: 5px solid green;
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: green;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Job Application Co-Pilot</h1>
+
+    <!-- UPLOAD RESUME -->
+    <h3>Upload Resume (PDF)</h3>
+    <input type="file" id="resumeFile" accept=".pdf" />
+    <br>
+    <button type="button" onclick="uploadResume()">Upload Resume</button>
+
+    <!-- RESUME TEXT -->
+    <h3>Resume Text</h3>
+    <textarea id="resumeText" rows="10" placeholder="Resume text will appear here after upload..."></textarea>
+
+    <!-- JOB DESCRIPTION -->
+    <h3>Job Description</h3>
+    <textarea id="jobDescription" rows="10" placeholder="Paste the job description here..."></textarea>
+
+    <br><br>
+    <button type="button" onclick="generateKit()">Generate Application Kit</button>
+
+    <!-- STATUS MESSAGE -->
+    <div id="status"></div>
+
+    <!-- RESULTS — each section is separate so they stay visible -->
+    <div id="fitAnalysis"></div>
+    <div id="resumeImprovement"></div>
+    <div id="rewrittenResume"></div>
+    <div id="coverLetter"></div>
+    <div id="interviewQA"></div>
+
+
+    <script>
+
+        async function uploadResume() {
+
+            let file = document.getElementById("resumeFile").files[0];
+
+            if (!file) {
+                alert("Please select a PDF file");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                let response = await fetch("http://127.0.0.1:8000/upload-resume", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await response.json();
+
+                document.getElementById("resumeText").value = data.resume_text;
+
+                alert("Resume Uploaded Successfully");
+
+            } catch (error) {
+                console.error(error);
+                alert("Upload Failed: " + error.message);
+            }
+        }
+
+
+        async function generateKit() {
+            event.preventDefault();  // ADD THIS FIRST LINE
+
+            let resumeText = document.getElementById("resumeText").value;
+            let jobDescription = document.getElementById("jobDescription").value;
+
+            if (!resumeText || !jobDescription) {
+                alert("Please enter Resume Text and Job Description");
+                return;
+            }
+
+            // Clear old results
+            document.getElementById("fitAnalysis").innerHTML = "";
+            document.getElementById("resumeImprovement").innerHTML = "";
+            document.getElementById("rewrittenResume").innerHTML = "";
+            document.getElementById("coverLetter").innerHTML = "";
+            document.getElementById("interviewQA").innerHTML = "";
+
+            // Show loading status
+            document.getElementById("status").innerHTML = "⏳ Generating Application Kit... Please wait.";
+
+            try {
+                let response = await fetch("http://127.0.0.1:8000/generate-application-kit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        resume_text: resumeText,
+                        job_description: jobDescription
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server Error: " + response.status);
+                }
+
+                let data = await response.json();
+
+                // Clear loading message
+                document.getElementById("status").innerHTML = "✅ Done!";
+
+                // Render each section separately — they stay on screen
+                document.getElementById("fitAnalysis").innerHTML =
+                    "<div class='section'><h3>Fit Analysis</h3><pre>" + data.fit_analysis + "</pre></div>";
+
+                document.getElementById("resumeImprovement").innerHTML =
+                    "<div class='section'><h3>Resume Improvement</h3><pre>" + data.resume_improvement + "</pre></div>";
+
+                document.getElementById("rewrittenResume").innerHTML =
+                    "<div class='section'><h3>Rewritten Resume</h3><pre>" + data.rewritten_resume + "</pre></div>";
+
+                document.getElementById("coverLetter").innerHTML =
+                    "<div class='section'><h3>Cover Letter</h3><pre>" + data.cover_letter + "</pre></div>";
+
+                document.getElementById("interviewQA").innerHTML =
+                    "<div class='section'><h3>Interview Questions & Answers</h3><pre>" + data.interview_qa + "</pre></div>";
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById("status").innerHTML =
+                    "<h3 style='color:red'>Error: " + error.message + "</h3>";
+            }
+        }
+
+    </script>
+
+</body>
+</html>
