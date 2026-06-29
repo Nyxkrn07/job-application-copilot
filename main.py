@@ -240,5 +240,5 @@ def view_applications():
     }
 
 # Bottom of main.py — last two lines
-frontend_path = os.path.join(os.path.dirname(__file__), "agents", "frontend")
-app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+frontend_path = os.path.join(os.path.dirname(__file__), "frontend")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")

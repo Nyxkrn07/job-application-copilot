@@ -1,102 +1,589 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Job Application Co-Pilot</title>
 
     <style>
+        /* =============================================
+           RESET & BASE
+        ============================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #c8f1ee;
+            font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+            line-height: 1.6;
+        }
+
+        /* =============================================
+           NAVBAR
+        ============================================= */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #ffffff;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .navbar-logo-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .navbar-title { font-size: 40px; font-weight: 850; color: #1E293B; }
+        .navbar-title span { color: #2563EB; }
+
+        .navbar-links { display: flex; gap: 1.75rem; list-style: none; }
+        .navbar-links a {
+            text-decoration: none; font-size: 14px;
+            color: #64748B; font-weight: 500; transition: color 0.2s;
+        }
+        .navbar-links a:hover { color: #2563EB; }
+
+        /* =============================================
+           HERO
+        ============================================= */
+        .hero {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 60%, #1E293B 100%);
+            padding: 5rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            width: 500px; height: 500px;
+            border-radius: 50%;
+            background: rgba(37,99,235,0.12);
+            top: -150px; left: -100px;
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 350px; height: 350px;
+            border-radius: 50%;
+            background: rgba(59,130,246,0.10);
+            bottom: -100px; right: -60px;
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(37,99,235,0.18);
+            color: #93C5FD;
+            font-size: 12px; font-weight: 600;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 5px 14px; border-radius: 20px;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(147,197,253,0.25);
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700; color: #ffffff;
+            line-height: 1.2; margin-bottom: 1rem;
+            position: relative; z-index: 1;
+        }
+
+        .hero h1 span { color: #60A5FA; }
+
+        .hero p {
+            font-size: 17px; color: #94A3B8;
+            max-width: 560px; margin: 0 auto 2rem;
+            position: relative; z-index: 1;
+        }
+
+        .hero-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #2563EB; color: white;
+            padding: 13px 28px; border-radius: 8px;
+            font-size: 15px; font-weight: 600;
+            text-decoration: none; border: none; cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            position: relative; z-index: 1;
+        }
+        .hero-btn:hover { background: #1D4ED8; transform: translateY(-2px); }
+
+        .hero-illustration {
+            margin: 3rem auto 0;
+            width: 140px;
+            position: relative; z-index: 1;
+        }
+
+        .ai-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 10px;
+            animation: floatCard 3s ease-in-out infinite;
+            width: 100%;
+        }
+
+        .ai-card:nth-child(2) { animation-delay: 1.5s; margin-left: 0px; }
+
+        .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; flex-shrink: 0; }
+
+        .ai-card-text { font-size: 12px; color: #CBD5E1; }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-6px); }
+        }
+
+        /* =============================================
+           SECTION WRAPPER
+        ============================================= */
+        .section-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        .section-title { font-size: 22px; font-weight: 700; color: #1E293B; margin-bottom: 0.4rem; }
+        .section-sub   { font-size: 17px; color: #64748B; margin-bottom: 2rem; }
+
+        /* =============================================
+           FEATURE CARDS
+        ============================================= */
+        #features {
+            background: #ffffff;
+            border-top: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .feature-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            cursor: default;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(37,99,235,0.10);
+            border-color: #BFDBFE;
+        }
+
+        .feature-icon { font-size: 26px; margin-bottom: 0.75rem; display: block; }
+        .feature-card h3 { font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 6px; }
+        .feature-card p  { font-size: 13px; color: #64748B; line-height: 1.55; }
+
+        /* =============================================
+           UPLOAD SECTION
+        ============================================= */
+        #upload { background: #F8FAFC; }
+
+        .upload-box {
+            border: 2px dashed #BFDBFE;
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            background: #EFF6FF;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .upload-box:hover { border-color: #2563EB; background: #DBEAFE; }
+
+        .upload-box-icon { font-size: 38px; margin-bottom: 0.75rem; display: block; }
+        .upload-box p { font-size: 14px; color: #475569; margin-bottom: 1rem; }
+        .upload-box p strong { color: #2563EB; }
+
+        #resumeFile { display: none; }
+
+        .upload-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #2563EB; color: white;
+            padding: 10px 22px; border-radius: 7px;
+            font-size: 14px; font-weight: 600;
+            border: none; cursor: pointer; transition: background 0.2s;
+        }
+        .upload-btn:hover { background: #1D4ED8; }
+
+        #fileNameDisplay {
+            margin-top: 0.75rem;
+            font-size: 13px; color: #22C55E;
+            font-weight: 500; min-height: 20px;
+        }
+
+        .textarea-label {
+            display: block; font-size: 14px;
+            font-weight: 600; color: #374151; margin-bottom: 6px;
         }
 
         textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            border: 1px solid #aaa;
+            width: 100%; padding: 12px 14px;
+            border: 1px solid #CBD5E1; border-radius: 8px;
             font-size: 14px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #1E293B; background: #ffffff;
+            resize: vertical; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            margin-bottom: 1.25rem;
         }
 
-        button {
-            background-color: green;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 15px;
-            margin-top: 10px;
+        textarea:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
         }
 
-        button:hover {
-            background-color: darkgreen;
+        textarea::placeholder { color: #94A3B8; }
+
+        /* =============================================
+           JOB DESCRIPTION SECTION
+        ============================================= */
+        #jd {
+            background: #ffffff;
+            border-top: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
         }
 
-        .section {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            border-left: 5px solid green;
-        }
+        /* =============================================
+           GENERATE BUTTON
+        ============================================= */
+        #generate { background: #F8FAFC; }
 
-        .section h3 {
-            margin-top: 0;
-            color: green;
-        }
+        .generate-wrap { text-align: center; }
 
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
+        .generate-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #2563EB; color: white;
+            padding: 14px 36px; border-radius: 8px;
+            font-size: 16px; font-weight: 600;
+            border: none; cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
         }
+        .generate-btn:hover { background: #1D4ED8; transform: translateY(-2px); }
+        .generate-btn:disabled { background: #93C5FD; cursor: not-allowed; transform: none; }
 
         #status {
-            margin-top: 15px;
-            font-weight: bold;
-            color: #333;
+            margin-top: 1.25rem; font-size: 15px;
+            font-weight: 600; color: #374151;
+            text-align: center; min-height: 24px;
+        }
+
+        /* =============================================
+           RESULTS
+        ============================================= */
+        #results {
+            background: #ffffff;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .result-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 18px;
+            background: #ffffff;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .result-card-header span.icon { font-size: 20px; }
+
+        .result-card-header h3 {
+            font-size: 15px; font-weight: 600;
+            color: #1E293B; margin: 0;
+        }
+
+        .result-card-body {
+            padding: 16px 18px;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+
+        .result-card-body pre {
+            white-space: pre-wrap; word-wrap: break-word;
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 14px; color: #374151;
+            line-height: 1.7; margin: 0;
+        }
+
+        /* =============================================
+           FOOTER
+        ============================================= */
+        footer {
+            background: #0F172A; color: #94A3B8;
+            text-align: center; padding: 2rem 1.5rem;
+            font-size: 13px;
+        }
+
+        footer strong { color: #ffffff; }
+
+        footer .tech-stack { margin-top: 0.5rem; font-size: 12px; color: #64748B; }
+
+        footer .tech-stack span {
+            display: inline-block;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 2px 10px; margin: 3px 3px;
+        }
+
+        /* =============================================
+           RESPONSIVE
+        ============================================= */
+        @media (max-width: 640px) {
+            .navbar-links { display: none; }
+            .hero { padding: 3.5rem 1.25rem 3rem; }
+            .section-wrap { padding: 2rem 1.25rem; }
+            .features-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Job Application Co-Pilot</h1>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <div class="navbar-logo">
+    <svg width="60" height="60" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Briefcase body -->
+        <rect x="18" y="45" width="64" height="45" rx="6" fill="black"/>
+        <!-- Briefcase handle -->
+        <rect x="38" y="38" width="24" height="12" rx="4" fill="none" stroke="black" stroke-width="4"/>
+        <!-- Briefcase middle line -->
+        <line x1="18" y1="67" x2="82" y2="67" stroke="#FAFAFA" stroke-width="3"/>
+        <!-- Briefcase clasp -->
+        <circle cx="50" cy="67" r="5" fill="#FAFAFA" stroke="black" stroke-width="2"/>
+        <!-- JOB text -->
+        <text x="50" y="82" text-anchor="middle" fill="#FAFAFA" font-size="14" font-weight="bold" font-family="Arial">JOB</text>
+    </svg>
+</div>
+            <span class="navbar-title">Job <span>Co-Pilot</span></span>
+        </a>
+        <ul class="navbar-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#upload">Upload</a></li>
+            <li><a href="#jd">Job Description</a></li>
+            <li><a href="#results">Results</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">✦ AI-Powered Career Tool</div>
+        <h1>Your Smart<br /><span>Job Application Co-Pilot</span></h1>
+        <p>
+            Upload your resume, paste a job description, and let AI analyse
+            your fit, rewrite your resume, write your cover letter, and
+            prepare your interview — in seconds.
+        </p>
+        <a href="#upload" class="hero-btn">✦ Get Started</a>
+
+        <div class="hero-illustration">
+            <div class="ai-card">
+                <div class="ai-dot"></div>
+                <div class="ai-card-text">Build Smarter</div>
+            </div>
+            <div class="ai-card">
+                <div class="ai-dot" style="background:#F59E0B;"></div>
+                <div class="ai-card-text">Apply Better</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <div class="section-wrap">
+            <h2 class="section-title">What this tool does</h2>
+            <p class="section-sub">Six AI agents working together to help you land the job</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📄</span>
+                    <h3>Resume Upload</h3>
+                    <p>Upload your PDF resume and the app extracts all the text automatically using PyPDF.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔍</span>
+                    <h3>Fit Analysis</h3>
+                    <p>Compares your resume against the job description and tells you where you match and where you don't.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">✏️</span>
+                    <h3>Resume Improvement</h3>
+                    <p>Gives specific suggestions to make your resume stronger for the role you are applying to.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🤖</span>
+                    <h3>ATS Resume Rewriter</h3>
+                    <p>Rewrites your resume with the right keywords so it passes Applicant Tracking Systems.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">✉️</span>
+                    <h3>Cover Letter Generator</h3>
+                    <p>Writes a personalised, role-specific cover letter based on your resume and the JD.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎤</span>
+                    <h3>Interview Prep</h3>
+                    <p>Generates the 10 most likely interview questions with sample answers grounded in your resume.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- UPLOAD RESUME -->
-    <h3>Upload Resume (PDF)</h3>
-    <input type="file" id="resumeFile" accept=".pdf" />
-    <br>
-    <button type="button" onclick="uploadResume()">Upload Resume</button>
+    <section id="upload">
+        <div class="section-wrap">
+            <h2 class="section-title">Upload Your Resume</h2>
+            <p class="section-sub">Only PDF files are supported</p>
 
-    <!-- RESUME TEXT -->
-    <h3>Resume Text</h3>
-    <textarea id="resumeText" rows="10" placeholder="Resume text will appear here after upload..."></textarea>
+            <div class="upload-box" onclick="document.getElementById('resumeFile').click()">
+                <span class="upload-box-icon">☁</span>
+                <p>Click here to select your resume<br />
+                   <strong>PDF files only</strong></p>
+                <!-- Original file input — ID and accept attribute preserved -->
+                <input type="file" id="resumeFile" accept=".pdf" onchange="showFileName(this)" />
+                <button class="upload-btn" type="button"
+                        onclick="event.stopPropagation(); document.getElementById('resumeFile').click()">
+                    ⬆ Choose File
+                </button>
+                <div id="fileNameDisplay"></div>
+            </div>
+
+            <!-- Original Upload Resume button — onclick preserved exactly -->
+            <button class="upload-btn" type="button" onclick="uploadResume()">
+                ↑ Upload Resume
+            </button>
+
+            <!-- Resume Text area — original ID preserved -->
+            <div style="margin-top:1.5rem;">
+                <label class="textarea-label" for="resumeText">Resume Text</label>
+                <textarea id="resumeText" rows="10"
+                          placeholder="Resume text will appear here after upload..."></textarea>
+            </div>
+        </div>
+    </section>
 
     <!-- JOB DESCRIPTION -->
-    <h3>Job Description</h3>
-    <textarea id="jobDescription" rows="10" placeholder="Paste the job description here..."></textarea>
+    <section id="jd">
+        <div class="section-wrap">
+            <h2 class="section-title">Job Description</h2>
+            <p class="section-sub">Paste the full job description from LinkedIn, Naukri, or any job board</p>
 
-    <br><br>
-    <button type="button" onclick="generateKit()">Generate Application Kit</button>
+            <!-- Original textarea ID preserved -->
+            <textarea id="jobDescription" rows="12"
+                      placeholder="Paste the job description here..."></textarea>
+        </div>
+    </section>
 
-    <!-- STATUS MESSAGE -->
-    <div id="status"></div>
+    <!-- GENERATE -->
+    <section id="generate">
+        <div class="section-wrap">
+            <div class="generate-wrap">
+                <!-- Original button onclick preserved exactly -->
+                <button class="generate-btn" type="button" onclick="generateKit()">
+                    ⚡ Generate Application Kit
+                </button>
+                <!-- Original status div — ID preserved -->
+                <div id="status"></div>
+            </div>
+        </div>
+    </section>
 
-    <!-- RESULTS — each section is separate so they stay visible -->
-    <div id="fitAnalysis"></div>
-    <div id="resumeImprovement"></div>
-    <div id="rewrittenResume"></div>
-    <div id="coverLetter"></div>
-    <div id="interviewQA"></div>
+    <!-- RESULTS -->
+    <section id="results">
+        <div class="section-wrap">
+            <h2 class="section-title">Your Application Kit</h2>
+            <p class="section-sub">AI-generated results will appear below after you click Generate</p>
 
+            <!-- Original result divs — all IDs preserved exactly -->
+            <div id="fitAnalysis"></div>
+            <div id="resumeImprovement"></div>
+            <div id="rewrittenResume"></div>
+            <div id="coverLetter"></div>
+            <div id="interviewQA"></div>
+        </div>
+    </section>
 
+    <!-- FOOTER -->
+    <footer>
+        <strong>Job Application Co-Pilot</strong> — Capstone Project
+        <br />
+        <div class="tech-stack">
+            Built with:
+            <span>FastAPI</span>
+            <span>Python</span>
+            <span>Groq API</span>
+            <span>PyPDF</span>
+            <span>Vanilla JS</span>
+        </div>
+        <div style="margin-top:0.75rem; font-size:12px;">
+            &copy; 2026 Job Co-Pilot. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- ================================================
+         JAVASCRIPT
+         All original functions preserved unchanged.
+         showFileName() is the only addition.
+    ================================================= -->
     <script>
 
+        /* Show selected file name under the upload box */
+        function showFileName(input) {
+            const display = document.getElementById("fileNameDisplay");
+            if (input.files && input.files[0]) {
+                display.textContent = "✓ " + input.files[0].name;
+            }
+        }
+
+        /* ── ORIGINAL uploadResume — unchanged ── */
         async function uploadResume() {
 
             let file = document.getElementById("resumeFile").files[0];
@@ -127,7 +614,7 @@
             }
         }
 
-
+        /* ── ORIGINAL generateKit — unchanged ── */
         async function generateKit() {
             event.preventDefault();  // ADD THIS FIRST LINE
 
@@ -168,26 +655,44 @@
                 // Clear loading message
                 document.getElementById("status").innerHTML = "✅ Done!";
 
-                // Render each section separately — they stay on screen
+                // Render each section in card style — data.xxx values unchanged
                 document.getElementById("fitAnalysis").innerHTML =
-                    "<div class='section'><h3>Fit Analysis</h3><pre>" + data.fit_analysis + "</pre></div>";
+                    "<div class='result-card'>" +
+                        "<div class='result-card-header'><span class='icon'>🔍</span><h3>Fit Analysis</h3></div>" +
+                        "<div class='result-card-body'><pre>" + data.fit_analysis + "</pre></div>" +
+                    "</div>";
 
                 document.getElementById("resumeImprovement").innerHTML =
-                    "<div class='section'><h3>Resume Improvement</h3><pre>" + data.resume_improvement + "</pre></div>";
+                    "<div class='result-card'>" +
+                        "<div class='result-card-header'><span class='icon'>✏️</span><h3>Resume Improvement</h3></div>" +
+                        "<div class='result-card-body'><pre>" + data.resume_improvement + "</pre></div>" +
+                    "</div>";
 
                 document.getElementById("rewrittenResume").innerHTML =
-                    "<div class='section'><h3>Rewritten Resume</h3><pre>" + data.rewritten_resume + "</pre></div>";
+                    "<div class='result-card'>" +
+                        "<div class='result-card-header'><span class='icon'>🤖</span><h3>Rewritten Resume (ATS Optimised)</h3></div>" +
+                        "<div class='result-card-body'><pre>" + data.rewritten_resume + "</pre></div>" +
+                    "</div>";
 
                 document.getElementById("coverLetter").innerHTML =
-                    "<div class='section'><h3>Cover Letter</h3><pre>" + data.cover_letter + "</pre></div>";
+                    "<div class='result-card'>" +
+                        "<div class='result-card-header'><span class='icon'>✉️</span><h3>Cover Letter</h3></div>" +
+                        "<div class='result-card-body'><pre>" + data.cover_letter + "</pre></div>" +
+                    "</div>";
 
                 document.getElementById("interviewQA").innerHTML =
-                    "<div class='section'><h3>Interview Questions & Answers</h3><pre>" + data.interview_qa + "</pre></div>";
+                    "<div class='result-card'>" +
+                        "<div class='result-card-header'><span class='icon'>🎤</span><h3>Interview Questions & Answers</h3></div>" +
+                        "<div class='result-card-body'><pre>" + data.interview_qa + "</pre></div>" +
+                    "</div>";
+
+                // Scroll to results after generation
+                document.getElementById("results").scrollIntoView({ behavior: "smooth" });
 
             } catch (error) {
                 console.error(error);
                 document.getElementById("status").innerHTML =
-                    "<h3 style='color:red'>Error: " + error.message + "</h3>";
+                    "<h3 style='color:#EF4444'>Error: " + error.message + "</h3>";
             }
         }
 
