@@ -630,7 +630,7 @@ background:#1D4ED8;
             formData.append("file", file);
 
             try {
-                let response = await fetch("http://127.0.0.1:8000/upload-resume", {
+                let response = await fetch("/upload-resume", {
                     method: "POST",
                     body: formData
                 });
@@ -670,7 +670,7 @@ background:#1D4ED8;
             document.getElementById("status").innerHTML = "⏳ Generating Application Kit... Please wait.";
 
             try {
-                let response = await fetch("http://127.0.0.1:8000/generate-application-kit", {
+                let response = await fetch("/generate-application-kit", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
